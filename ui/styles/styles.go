@@ -11,7 +11,11 @@ var Text lipgloss.Style = lipgloss.NewStyle().
 	Foreground(lipgloss.White)
 
 var SelectedText lipgloss.Style = lipgloss.NewStyle().
-	Foreground(lipgloss.BrightBlue).
+	Foreground(lipgloss.Blue).
+	Bold(true)
+
+var ErrorText lipgloss.Style = lipgloss.NewStyle().
+	Foreground(lipgloss.BrightRed).
 	Bold(true)
 
 var Border lipgloss.Style = lipgloss.NewStyle().
