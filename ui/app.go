@@ -17,10 +17,9 @@ type AppModel struct {
 
 func NewAppModel() AppModel {
 	return AppModel{
-		activePageKey: events.InputPageKey,
+		activePageKey: events.ChooseRestaurantPageKey,
 		pages: map[events.PageKey]PageModel{
-			events.InputPageKey:   pages.NewInputPage(),
-			events.DisplayPageKey: pages.NewDisplayPage(),
+			events.ChooseRestaurantPageKey: pages.NewChooseRestaurantPage(),
 		},
 		sharedData: make(map[string]string),
 	}
@@ -47,19 +46,6 @@ func (m AppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.activePageKey = msg.To
 			return m, targetPage.Init()
 		}
-
-	// Jede GlobalDataMsg im zentralen Speicher sichern UND an alle Seiten verteilen
-	case events.GlobalDataMsg:
-		m.sharedData[msg.Key] = msg.Value
-
-		for key, page := range m.pages {
-			updatedPage, cmd := page.Update(msg)
-			if p, ok := updatedPage.(PageModel); ok {
-				m.pages[key] = p
-			}
-			cmds = append(cmds, cmd)
-		}
-		return m, tea.Batch(cmds...)
 	}
 
 	// Update für die aktuell aktive Seite

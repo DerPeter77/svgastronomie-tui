@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/DerPeter77/svgastronomie-tui/ui"
-
 	tea "charm.land/bubbletea/v2"
+	"github.com/DerPeter77/svgastronomie-tui/ui"
 )
 
 func main() {
