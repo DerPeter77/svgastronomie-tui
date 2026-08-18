@@ -1,4 +1,4 @@
-module svgastronomie-tui
+module github.com/DerPeter77/svgastronomie-tui
 
 go 1.26.5
 

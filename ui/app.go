@@ -1,8 +1,8 @@
 package ui
 
 import (
-	"svgastronomie-tui/ui/events"
-	"svgastronomie-tui/ui/pages"
+	"github.com/DerPeter77/svgastronomie-tui/ui/events"
+	"github.com/DerPeter77/svgastronomie-tui/ui/pages"
 
 	tea "charm.land/bubbletea/v2"
 )

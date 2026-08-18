@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"svgastronomie/ui"
+	"github.com/DerPeter77/svgastronomie-tui/ui"
 
 	tea "charm.land/bubbletea/v2"
 )

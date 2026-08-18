@@ -1,7 +1,7 @@
 package pages
 
 import (
-	"svgastronomie-tui/ui/events"
+	"github.com/DerPeter77/svgastronomie-tui/ui/events"
 	"fmt"
 
 	tea "charm.land/bubbletea/v2"
