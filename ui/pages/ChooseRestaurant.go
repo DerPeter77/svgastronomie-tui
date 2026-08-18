@@ -143,7 +143,7 @@ func (m ChooseRestaurantModel) View() tea.View {
 	text += styles.Text.Render("\n" + strings.Join(restaurants, "\n"))
 
 	if m.err != nil {
-		text += styles.ErrorText.Render(m.err.Error())
+		text += styles.ErrorText.Render("\n\n" + m.err.Error())
 	}
 
 	finalString := lipgloss.JoinVertical(lipgloss.Left, headline, text)
