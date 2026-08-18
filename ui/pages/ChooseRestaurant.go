@@ -159,8 +159,7 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					return AddRestaurantCmd(savedDefaultPath, Restaurant{Name: name, Url: url})
 				}, GetRestaurantsCmd(savedDefaultPath))
 			} else {
-				events.NavigateTo(events.ShowRestaurantPageKey)
-				return m, nil
+				return m, events.NavigateTo(events.ShowRestaurantPageKey)
 			}
 		case "a":
 			if !m.addingMode {

@@ -20,6 +20,7 @@ func NewAppModel() AppModel {
 		activePageKey: events.ChooseRestaurantPageKey,
 		pages: map[events.PageKey]PageModel{
 			events.ChooseRestaurantPageKey: pages.NewChooseRestaurantPage(),
+			events.ShowRestaurantPageKey:   pages.NewShowRestaurantPage(),
 		},
 		sharedData: make(map[string]string),
 	}

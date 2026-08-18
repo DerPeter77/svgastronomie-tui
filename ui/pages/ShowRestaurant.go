@@ -46,7 +46,7 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m ShowRestaurantModel) View() tea.View {
 	headline := styles.Headline.Render("SV Restaurant TUI")
 
-	text := styles.Text.Render("Wähle das Restaurant aus!\n")
+	text := styles.Text.Render("Ansicht vom Restaurant!\n")
 
 	if m.err != nil {
 		text += styles.ErrorText.Render(m.err.Error())
