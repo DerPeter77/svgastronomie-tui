@@ -17,18 +17,9 @@ import (
 
 const savedDefaultPath string = "SavedRestaurants.yaml"
 
-// Types and Functions for Saving Restaurants in yaml File
-type Restaurant struct {
-	Name string `yaml:"name"`
-	Url  string `yaml:"url"`
-}
-
-type SavedRestaurants struct {
-	Restaurants []Restaurant `yaml:"restaurants"`
-}
-
-func getSavedRestaurantsFromYAML(path string) (SavedRestaurants, error) {
-	savedRestaurants := SavedRestaurants{}
+// Functions for Saving Restaurants in yaml File
+func getSavedRestaurantsFromYAML(path string) (events.SavedRestaurants, error) {
+	savedRestaurants := events.SavedRestaurants{}
 	file, err := os.ReadFile(path)
 	if err != nil {
 		os.Create(savedDefaultPath)
@@ -38,7 +29,7 @@ func getSavedRestaurantsFromYAML(path string) (SavedRestaurants, error) {
 	return savedRestaurants, nil
 }
 
-func saveRestaurants(path string, savedRestaurants SavedRestaurants) error {
+func saveRestaurants(path string, savedRestaurants events.SavedRestaurants) error {
 	bytes, err := yaml.Marshal(savedRestaurants)
 	if err != nil {
 		return err
@@ -47,7 +38,7 @@ func saveRestaurants(path string, savedRestaurants SavedRestaurants) error {
 	return nil
 }
 
-func addRestaurant(path string, restaurant Restaurant) error {
+func addRestaurant(path string, restaurant events.Restaurant) error {
 	saved, err := getSavedRestaurantsFromYAML(path)
 	if err != nil {
 		return err
@@ -62,13 +53,13 @@ func addRestaurant(path string, restaurant Restaurant) error {
 
 type AddRestaurantCmdError error
 
-func AddRestaurantCmd(path string, restaurant Restaurant) tea.Msg {
+func AddRestaurantCmd(path string, restaurant events.Restaurant) tea.Msg {
 	err := addRestaurant(path, restaurant)
 	return AddRestaurantCmdError(err)
 }
 
 type RestaurantsMsg struct {
-	Restaurants SavedRestaurants
+	Restaurants events.SavedRestaurants
 	err         error
 }
 
@@ -87,7 +78,7 @@ func ErrorTick() tea.Msg {
 // Bubbletea TUI
 
 type ChooseRestaurantModel struct {
-	savedRestaurants SavedRestaurants
+	savedRestaurants events.SavedRestaurants
 	cursorRestaurant int
 	err              error
 
@@ -111,7 +102,7 @@ func NewChooseRestaurantPage() ChooseRestaurantModel {
 	urlInput.CharLimit = 0
 	urlInput.SetWidth(50)
 	return ChooseRestaurantModel{
-		savedRestaurants: SavedRestaurants{Restaurants: []Restaurant{}},
+		savedRestaurants: events.SavedRestaurants{Restaurants: []events.Restaurant{}},
 		cursorRestaurant: 0,
 		err:              nil,
 		addingMode:       false,
@@ -156,10 +147,13 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.nameInput.Reset()
 				m.urlInput.Reset()
 				return m, tea.Batch(func() tea.Msg {
-					return AddRestaurantCmd(savedDefaultPath, Restaurant{Name: name, Url: url})
+					return AddRestaurantCmd(savedDefaultPath, events.Restaurant{Name: name, Url: url})
 				}, GetRestaurantsCmd(savedDefaultPath))
 			} else {
-				return m, events.NavigateTo(events.ShowRestaurantPageKey)
+				return m, tea.Batch(
+					events.NavigateTo(events.ShowRestaurantPageKey),
+					func() tea.Msg { return events.ChooseRestaurantMsg(m.savedRestaurants.Restaurants[m.cursorRestaurant])},
+				)
 			}
 		case "a":
 			if !m.addingMode {

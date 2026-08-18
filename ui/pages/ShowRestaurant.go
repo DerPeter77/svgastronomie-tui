@@ -12,13 +12,13 @@ import (
 // Bubbletea TUI
 
 type ShowRestaurantModel struct {
-	showRestaurant Restaurant
+	showRestaurant events.Restaurant
 	err            error
 }
 
 func NewShowRestaurantPage() ShowRestaurantModel {
 	return ShowRestaurantModel{
-		showRestaurant: Restaurant{},
+		showRestaurant: events.Restaurant{},
 		err:            nil,
 	}
 }
@@ -34,11 +34,12 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "up":
 		case "down":
 		case "esc":
-			events.NavigateTo(events.ChooseRestaurantPageKey)
-			return m, nil
+			return m, events.NavigateTo(events.ChooseRestaurantPageKey)
 		case "q":
 			return m, tea.Quit
 		}
+	case events.ChooseRestaurantMsg:
+		m.showRestaurant = events.Restaurant(msg)
 	}
 	return m, nil
 }
@@ -46,7 +47,7 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m ShowRestaurantModel) View() tea.View {
 	headline := styles.Headline.Render("SV Restaurant TUI")
 
-	text := styles.Text.Render("Ansicht vom Restaurant!\n")
+	text := styles.Text.Render("Ansicht vom Restaurant: " + m.showRestaurant.Name)
 
 	if m.err != nil {
 		text += styles.ErrorText.Render(m.err.Error())

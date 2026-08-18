@@ -22,3 +22,14 @@ func NavigateTo(key PageKey) tea.Cmd {
 		return NavigationMsg{To: key}
 	}
 }
+
+type Restaurant struct {
+	Name string `yaml:"name"`
+	Url  string `yaml:"url"`
+}
+
+type SavedRestaurants struct {
+	Restaurants []Restaurant `yaml:"restaurants"`
+}
+
+type ChooseRestaurantMsg Restaurant

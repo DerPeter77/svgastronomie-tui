@@ -47,6 +47,11 @@ func (m AppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.activePageKey = msg.To
 			return m, targetPage.Init()
 		}
+
+	case events.ChooseRestaurantMsg:
+		model, cmd := m.pages[events.ShowRestaurantPageKey].Update(msg)
+		m.pages[events.ShowRestaurantPageKey] = model
+		return m, cmd
 	}
 
 	// Update für die aktuell aktive Seite
