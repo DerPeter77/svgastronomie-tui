@@ -22,3 +22,40 @@ var Border lipgloss.Style = lipgloss.NewStyle().
 	Border(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.BrightBlack).
 	Padding(1, 2)
+
+var activeTabBorder = lipgloss.Border{
+	Top:         "─",
+	Bottom:      " ",
+	Left:        "│",
+	Right:       "│",
+	TopLeft:     "╭",
+	TopRight:    "╮",
+	BottomLeft:  "┘",
+	BottomRight: "└",
+}
+
+var tabBorder = lipgloss.Border{
+	Top:         "─",
+	Bottom:      "─",
+	Left:        "│",
+	Right:       "│",
+	TopLeft:     "╭",
+	TopRight:    "╮",
+	BottomLeft:  "┴",
+	BottomRight: "┴",
+}
+
+var Tab = lipgloss.NewStyle().
+	Border(tabBorder, true).
+	BorderForeground(lipgloss.White).
+	Padding(0, 1)
+
+var ActiveTab = Tab.
+	Border(activeTabBorder, true).
+	Foreground(lipgloss.BrightWhite).
+	BorderForeground(lipgloss.BrightWhite)
+
+var TabGap = Tab.
+	BorderTop(false).
+	BorderLeft(false).
+	BorderRight(false)

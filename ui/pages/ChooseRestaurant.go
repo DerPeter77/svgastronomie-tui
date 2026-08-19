@@ -152,7 +152,7 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				return m, tea.Batch(
 					events.NavigateTo(events.ShowRestaurantPageKey),
-					func() tea.Msg { return events.ChooseRestaurantMsg(m.savedRestaurants.Restaurants[m.cursorRestaurant])},
+					func() tea.Msg { return events.ChooseRestaurantMsg(m.savedRestaurants.Restaurants[m.cursorRestaurant]) },
 				)
 			}
 		case "a":
@@ -225,5 +225,7 @@ func (m ChooseRestaurantModel) View() tea.View {
 	}
 
 	finalString := lipgloss.JoinVertical(lipgloss.Left, headline, text)
-	return tea.NewView(finalString)
+	view := tea.NewView(finalString)
+	view.AltScreen = true
+	return view
 }
