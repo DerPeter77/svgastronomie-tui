@@ -13,3 +13,7 @@ TUI in Go for SV Restaurant "Speiseplan"
 ```sh
 go install github.com/DerPeter77/svgastronomie-tui@latest
 ```
+
+### Lib for Web Scraping:
+
+https://github.com/EchterTimo/go-svgastronomie
