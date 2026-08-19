@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -56,6 +57,35 @@ type AddRestaurantCmdError error
 func AddRestaurantCmd(path string, restaurant events.Restaurant) tea.Msg {
 	err := addRestaurant(path, restaurant)
 	return AddRestaurantCmdError(err)
+}
+
+func deleteRestaurant(path string, restaurant events.Restaurant) (deleted []events.Restaurant, err error) {
+	saved, err := getSavedRestaurantsFromYAML(path)
+	if err != nil {
+		return nil, err
+	}
+
+	for index, value := range saved.Restaurants {
+		if restaurant == value {
+			deleted = append(deleted, value)
+			saved.Restaurants = slices.Delete(saved.Restaurants, index, index+1)
+			break
+		}
+	}
+
+	err = saveRestaurants(path, saved)
+
+	return deleted, err
+}
+
+type DeleteRestaurantMsg struct {
+	deleted_restaurant []events.Restaurant
+	err                error
+}
+
+func DeleteRestaurantCmd(path string, restaurant events.Restaurant) tea.Msg {
+	deleted, err := deleteRestaurant(path, restaurant)
+	return DeleteRestaurantMsg{deleted_restaurant: deleted, err: err}
 }
 
 type RestaurantsMsg struct {
@@ -173,6 +203,9 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case "d":
+			return m, func() tea.Msg {
+				return DeleteRestaurantCmd(savedDefaultPath, m.savedRestaurants.Restaurants[m.cursorRestaurant])
+			}
 		case "r":
 			return m, GetRestaurantsCmd(savedDefaultPath)
 		case "q":
@@ -183,6 +216,13 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.err = msg.err
 	case AddRestaurantCmdError:
 		m.err = msg
+	case DeleteRestaurantMsg:
+		if m.err != nil {
+			m.err = fmt.Errorf("Error: %v", msg.err.Error())
+		} else {
+			m.err = fmt.Errorf("Deleted Restaurants: %v", msg.deleted_restaurant[0].Name)
+		}
+		return m, GetRestaurantsCmd(savedDefaultPath)
 	}
 
 	m.nameInput, cmd = m.nameInput.Update(msg)
@@ -201,8 +241,6 @@ func (m ChooseRestaurantModel) View() tea.View {
 
 	// Selection Mode
 	if m.addingMode == false {
-		text += styles.Text.Render("\n[R] Neu laden   -   [A] Neues Restaurant   -   [D] Ausgewähltes Restaurant löschen")
-
 		var restaurants []string
 		for index, value := range m.savedRestaurants.Restaurants {
 			textstyle := styles.Text
@@ -218,6 +256,8 @@ func (m ChooseRestaurantModel) View() tea.View {
 		if m.err != nil {
 			text += styles.ErrorText.Render("\n\n" + m.err.Error())
 		}
+
+		text += styles.Text.Render("\n\n\n\n\n[R] Neu laden   -   [A] Neues Restaurant   -   [D] Ausgewähltes Restaurant löschen")
 	} else {
 		// Adding Mode
 		text += styles.Text.Render("\n" + m.nameInput.View())
