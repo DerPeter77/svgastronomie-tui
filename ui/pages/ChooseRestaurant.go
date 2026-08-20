@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 	"time"
@@ -16,17 +17,41 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
-const savedDefaultPath string = "SavedRestaurants.yaml"
+type defaultPathMsg struct {
+	path string
+	err  error
+}
+
+func loadDefaultPath() tea.Msg {
+	userconfdir, err := os.UserConfigDir()
+
+	finalConfigDir := filepath.Join(userconfdir, "svgastronomie-tui", "restaurants.yaml")
+
+	return defaultPathMsg{path: finalConfigDir, err: err}
+}
 
 // Functions for Saving Restaurants in yaml File
 func getSavedRestaurantsFromYAML(path string) (events.SavedRestaurants, error) {
 	savedRestaurants := events.SavedRestaurants{}
-	file, err := os.ReadFile(path)
-	if err != nil {
-		os.Create(savedDefaultPath)
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
 		return savedRestaurants, err
 	}
-	yaml.Unmarshal(file, &savedRestaurants)
+	file, err := os.ReadFile(path)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			_, createErr := os.Create(path)
+			if createErr != nil {
+				return savedRestaurants, createErr
+			}
+			return savedRestaurants, nil
+		}
+		return savedRestaurants, err
+	}
+	err = yaml.Unmarshal(file, &savedRestaurants)
+	if err != nil {
+		return savedRestaurants, err
+	}
 	return savedRestaurants, nil
 }
 
@@ -108,6 +133,7 @@ func ErrorTick() tea.Msg {
 // Bubbletea TUI
 
 type ChooseRestaurantModel struct {
+	userConfPath     string
 	savedRestaurants events.SavedRestaurants
 	cursorRestaurant int
 	err              error
@@ -142,7 +168,7 @@ func NewChooseRestaurantPage() ChooseRestaurantModel {
 }
 
 func (m ChooseRestaurantModel) Init() tea.Cmd {
-	return tea.Batch(ErrorTick, GetRestaurantsCmd(savedDefaultPath))
+	return tea.Batch(ErrorTick, loadDefaultPath)
 }
 
 func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -177,8 +203,8 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.nameInput.Reset()
 				m.urlInput.Reset()
 				return m, tea.Batch(func() tea.Msg {
-					return AddRestaurantCmd(savedDefaultPath, events.Restaurant{Name: name, Url: url})
-				}, GetRestaurantsCmd(savedDefaultPath))
+					return AddRestaurantCmd(m.userConfPath, events.Restaurant{Name: name, Url: url})
+				}, GetRestaurantsCmd(m.userConfPath))
 			} else {
 				return m, tea.Batch(
 					events.NavigateTo(events.ShowRestaurantPageKey),
@@ -204,10 +230,10 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "d":
 			return m, func() tea.Msg {
-				return DeleteRestaurantCmd(savedDefaultPath, m.savedRestaurants.Restaurants[m.cursorRestaurant])
+				return DeleteRestaurantCmd(m.userConfPath, m.savedRestaurants.Restaurants[m.cursorRestaurant])
 			}
 		case "r":
-			return m, GetRestaurantsCmd(savedDefaultPath)
+			return m, GetRestaurantsCmd(m.userConfPath)
 		case "q":
 			return m, tea.Quit
 		}
@@ -222,7 +248,13 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			m.err = fmt.Errorf("Deleted Restaurants: %v", msg.deleted_restaurant[0].Name)
 		}
-		return m, GetRestaurantsCmd(savedDefaultPath)
+		return m, GetRestaurantsCmd(m.userConfPath)
+	case defaultPathMsg:
+		if msg.err != nil {
+			m.err = msg.err
+		}
+		m.userConfPath = msg.path
+		return m, GetRestaurantsCmd(m.userConfPath)
 	}
 
 	m.nameInput, cmd = m.nameInput.Update(msg)
