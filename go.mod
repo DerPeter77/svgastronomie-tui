@@ -6,11 +6,7 @@ require (
 	charm.land/bubbles/v2 v2.1.1
 	charm.land/bubbletea/v2 v2.0.9
 	charm.land/lipgloss/v2 v2.0.6
-<<<<<<< HEAD
-	github.com/EchterTimo/go-svgastronomie v0.1.3
-=======
 	github.com/EchterTimo/go-svgastronomie v0.1.4
->>>>>>> 474944a (config is saved now in User config dir)
 	github.com/goccy/go-yaml v1.19.2
 )
 
