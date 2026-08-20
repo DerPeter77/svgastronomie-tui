@@ -21,7 +21,24 @@ type ShowRestaurantModel struct {
 	showRestaurant    events.Restaurant
 	scrapedRestaurant sv.Restaurant
 	activeDayTab      int
+	loading           bool
 	err               error
+}
+
+type ScrapeRestaurantMsg struct {
+	restaurant *sv.Restaurant
+	err        error
+}
+
+func ScrapeRestaurantCmd(url string) tea.Cmd {
+	return func() tea.Msg {
+		scrapedRestaurant, err := sv.ScrapeRestaurant(url, nil)
+		if err != nil {
+			return ScrapeRestaurantMsg{restaurant: nil, err: err}
+		}
+
+		return ScrapeRestaurantMsg{restaurant: scrapedRestaurant, err: nil}
+	}
 }
 
 func NewShowRestaurantPage() ShowRestaurantModel {
@@ -29,6 +46,7 @@ func NewShowRestaurantPage() ShowRestaurantModel {
 		showRestaurant:    events.Restaurant{},
 		scrapedRestaurant: sv.Restaurant{},
 		activeDayTab:      0,
+		loading:           false,
 		err:               nil,
 	}
 }
@@ -46,9 +64,15 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.String() {
 		case "left", "a":
 			length := len(m.scrapedRestaurant.Week.Days)
+			if length == 0 {
+				return m, nil
+			}
 			m.activeDayTab = (m.activeDayTab - 1 + length) % length
 		case "right", "d":
 			length := len(m.scrapedRestaurant.Week.Days)
+			if length == 0 {
+				return m, nil
+			}
 			m.activeDayTab = (m.activeDayTab + 1) % length
 		case "esc":
 			return m, events.NavigateTo(events.ChooseRestaurantPageKey)
@@ -57,14 +81,30 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case events.ChooseRestaurantMsg:
 		m.showRestaurant = events.Restaurant(msg)
+		m.loading = true
+		m.err = nil
+		m.scrapedRestaurant = sv.Restaurant{}
+		m.activeDayTab = 0
 
-		scrapedRestaurant, err := sv.ScrapeRestaurant(m.showRestaurant.Url, nil)
-		if err != nil {
-			m.err = err
+		return m, ScrapeRestaurantCmd(m.showRestaurant.Url)
+
+	case ScrapeRestaurantMsg:
+		m.loading = false
+		if msg.err != nil {
+			m.err = msg.err
 			return m, nil
 		}
 
-		m.scrapedRestaurant = *scrapedRestaurant
+		if msg.restaurant != nil {
+			m.scrapedRestaurant = *msg.restaurant
+		}
+
+		daysLen := len(m.scrapedRestaurant.Week.Days)
+		if daysLen == 0 {
+			m.activeDayTab = 0
+		} else if m.activeDayTab >= daysLen {
+			m.activeDayTab = daysLen - 1
+		}
 	}
 	return m, nil
 }
@@ -91,6 +131,28 @@ func (m ShowRestaurantModel) View() tea.View {
 
 	text += tabsRow
 	text += "\n\n"
+
+	if m.loading {
+		text += styles.Text.Render("Lade Speiseplan...")
+
+		finalString := lipgloss.JoinVertical(lipgloss.Left, headline, text)
+		view := tea.NewView(finalString)
+		view.AltScreen = true
+		return view
+	}
+
+	if len(m.scrapedRestaurant.Week.Days) == 0 {
+		text += styles.Text.Render("Kein Speiseplan verfuegbar.")
+
+		if m.err != nil {
+			text += "\n" + styles.ErrorText.Render(m.err.Error())
+		}
+
+		finalString := lipgloss.JoinVertical(lipgloss.Left, headline, text)
+		view := tea.NewView(finalString)
+		view.AltScreen = true
+		return view
+	}
 
 	// Dishes per tab
 	var dishes []string
