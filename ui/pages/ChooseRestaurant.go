@@ -202,9 +202,15 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.addingMode = false
 				m.nameInput.Reset()
 				m.urlInput.Reset()
-				return m, tea.Batch(func() tea.Msg {
-					return AddRestaurantCmd(m.userConfPath, events.Restaurant{Name: name, Url: url})
-				}, GetRestaurantsCmd(m.userConfPath))
+				return m, tea.Sequence(
+					func() tea.Msg {
+						return AddRestaurantCmd(m.userConfPath, events.Restaurant{Name: name, Url: url})
+					},
+					func() tea.Msg {
+						restaurants, err := getSavedRestaurantsFromYAML(m.userConfPath)
+						return RestaurantsMsg{Restaurants: restaurants, err: err}
+					},
+				)
 			} else {
 				return m, tea.Batch(
 					events.NavigateTo(events.ShowRestaurantPageKey),
