@@ -280,7 +280,7 @@ func (m ChooseRestaurantModel) View() tea.View {
 				textstyle = styles.SelectedText
 			}
 
-			restaurants = append(restaurants, textstyle.Render(fmt.Sprintf("Restaurant: %v - Url: %v", value.Name, value.Url)))
+			restaurants = append(restaurants, textstyle.Render(fmt.Sprintf("Restaurant: %v", value.Name)))
 		}
 
 		text += styles.Text.Render("\n\n" + strings.Join(restaurants, "\n"))
