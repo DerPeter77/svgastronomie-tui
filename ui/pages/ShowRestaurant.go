@@ -95,10 +95,12 @@ func (m ShowRestaurantModel) View() tea.View {
 	// Dishes per tab
 	var dishes []string
 	for _, dish := range m.scrapedRestaurant.Week.Days[m.activeDayTab].Dishes {
-		dishes = append(dishes, styles.Border.Render(styles.Text.Render(fmt.Sprintf("%v - %v€ \n%v - %v", dish.Name, dish.Price, dish.Tags, dish.Description))))
-
-		// TEMP DEBUG Text
-		// dishes = append(dishes, fmt.Sprintf("%v - %v - %v - %v - %v", m.scrapedRestaurant.Week.Days[m.activeDayTab].Time, dish.Name, dish.Price, dish.Tags, dish.Description))
+		tags := ""
+		if len(dish.Tags) > 0 {
+			tags = " - "
+			tags += strings.Join(dish.Tags, ", ")
+		}
+		dishes = append(dishes, styles.Border.Render(styles.Text.Render(fmt.Sprintf("%v - %v€ \n%v%v", dish.Name, dish.Price, dish.Description, tags))))
 	}
 
 	text += strings.Join(dishes, "\n")
