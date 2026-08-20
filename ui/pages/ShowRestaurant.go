@@ -44,10 +44,10 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "left":
+		case "left", "a":
 			length := len(m.scrapedRestaurant.Week.Days)
 			m.activeDayTab = (m.activeDayTab - 1 + length) % length
-		case "right":
+		case "right", "d":
 			length := len(m.scrapedRestaurant.Week.Days)
 			m.activeDayTab = (m.activeDayTab + 1) % length
 		case "esc":

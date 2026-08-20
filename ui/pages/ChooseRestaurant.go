@@ -181,14 +181,14 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, ErrorTick
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "up":
+		case "up", "w":
 			if len(m.savedRestaurants.Restaurants) == 0 {
 				m.err = errors.New("Füge erstmal Restaurants hinzu!")
 				return m, nil
 			}
 			length := len(m.savedRestaurants.Restaurants)
 			m.cursorRestaurant = (m.cursorRestaurant - 1 + length) % length
-		case "down":
+		case "down", "s":
 			if len(m.savedRestaurants.Restaurants) == 0 {
 				m.err = errors.New("Füge erstmal Restaurants hinzu!")
 				return m, nil
