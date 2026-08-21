@@ -5,14 +5,15 @@
 <p align="center">
   <a href="https://github.com/DerPeter77/svgastronomie-tui/releases"><img alt="release" src="https://shieldcn.dev/github/DerPeter77/svgastronomie-tui/release.svg" /></a>
   <a href="https://github.com/DerPeter77/svgastronomie-tui"><img alt="license" src="https://shieldcn.dev/github/DerPeter77/svgastronomie-tui/license.svg" /></a>
+  <a href="https://pkg.go.dev/github.com/DerPeter77/svgastronomie-tui"><img alt="badge" src="https://shieldcn.dev/badge/Reference.svg?split=true&amp;logo=go&amp;color=06b6d4&amp;labelColor=5b5b5b&amp;valueColor=06b6d4" /></a>
 </p>
 
 ## Install
 
-[![badge](https://shieldcn.dev/badge/Reference.svg?size=xs&split=true&logo=go&logoColor=ffffff&labelColor=434343&brand=go&iconSize=22)](https://pkg.go.dev/github.com/DerPeter77/svgastronomie-tui)
-
 ```go install github.com/DerPeter77/svgastronomie-tui@latest```
 
-### Lib used for scraping the menu
+### Lib used for scraping the menu:
+
+[![badge](https://shieldcn.dev/badge/GitHub-EchterTimo.svg?logo=github&brand=github)](https://github.com/EchterTimo/go-svgastronomie)
 
 [go-svgastronomie by EchterTimo](https://github.com/EchterTimo/go-svgastronomie)
