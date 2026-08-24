@@ -157,7 +157,14 @@ func (m ShowRestaurantModel) View() tea.View {
 				tags = " - "
 				tags += strings.Join(dish.Tags, ", ")
 			}
-			dishes = append(dishes, lipgloss.Wrap(styles.Text.Render(fmt.Sprintf("%v - %.2f€ \n%v%v", dish.Name, dish.Price, dish.Description, tags)), m.width, ""))
+			dishes = append(dishes,
+				styles.Border.Render(
+					lipgloss.Wrap(
+						styles.Text.Render(fmt.Sprintf("%v - %.2f€ \n%v%v", dish.Name, dish.Price, dish.Description, tags)),
+						m.width-10, "",
+					),
+				),
+			)
 		}
 
 		text += strings.Join(dishes, "\n")

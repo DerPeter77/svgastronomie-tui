@@ -21,7 +21,7 @@ var ErrorText lipgloss.Style = lipgloss.NewStyle().
 var Border lipgloss.Style = lipgloss.NewStyle().
 	Border(lipgloss.NormalBorder()).
 	BorderForeground(lipgloss.BrightBlack).
-	Padding(1, 2)
+	Padding(0, 2)
 
 var activeTabBorder = lipgloss.Border{
 	Top:         "─",
