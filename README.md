@@ -16,6 +16,4 @@ go install github.com/DerPeter77/svgastronomie-tui@latest
 
 ## Lib used for scraping the menu
 
-[![badge](https://shieldcn.dev/badge/GitHub-EchterTimo.svg?logo=github&brand=github)](https://github.com/EchterTimo/go-svgastronomie)
-
-[go-svgastronomie by EchterTimo](https://github.com/EchterTimo/go-svgastronomie)
+[![repo card](https://github-stats-extended.vercel.app/api/pin/?username=EchterTimo&repo=go-svgastronomie)](https://github.com/EchterTimo/go-svgastronomie)
