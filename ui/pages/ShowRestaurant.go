@@ -37,10 +37,10 @@ func Version() (version string, ok bool) {
 }
 
 // Spinners
-var sandspinner = []string{"⠁", "⠂", "⠄", "⡀", "⡈", "⡐", "⡠", "⣀", "⣁", "⣂", "⣄", "⣌", "⣔",
-	"⣤", "⣥", "⣦", "⣮", "⣶", "⣷", "⣿", "⡿", "⠿", "⢟", "⠟", "⡛", "⠛", "⠫", "⢋", "⠋", "⠍", "⡉", "⠉", "⠑", "⠡", "⢁"}
+// var sandspinner = []string{"⠁", "⠂", "⠄", "⡀", "⡈", "⡐", "⡠", "⣀", "⣁", "⣂", "⣄", "⣌", "⣔",
+// 	"⣤", "⣥", "⣦", "⣮", "⣶", "⣷", "⣿", "⡿", "⠿", "⢟", "⠟", "⡛", "⠛", "⠫", "⢋", "⠋", "⠍", "⡉", "⠉", "⠑", "⠡", "⢁"}
 
-// var circlespinner = []string{"◜", "◠", "◝", "◞", "◡", "◟"}
+var circlespinner = []string{"◜", "◠", "◝", "◞", "◡", "◟"}
 
 // var starspinner = []string{"✶", "✸", "✹", "✺", "✹", "✷"}
 
@@ -70,7 +70,7 @@ type ShowRestaurantModel struct {
 
 func NewShowRestaurantPage() ShowRestaurantModel {
 	spinner := spinner.New()
-	spinner.Spinner.Frames = sandspinner
+	spinner.Spinner.Frames = circlespinner
 	spinner.Spinner.FPS = time.Second / 12
 	return ShowRestaurantModel{
 		showRestaurant:    events.Restaurant{},
