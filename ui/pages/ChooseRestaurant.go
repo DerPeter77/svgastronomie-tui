@@ -183,19 +183,23 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "up", "w":
-			if len(m.savedRestaurants.Restaurants) == 0 {
-				m.err = errors.New("Füge erstmal Restaurants hinzu!")
-				return m, nil
+			if !m.addingMode {
+				if len(m.savedRestaurants.Restaurants) == 0 {
+					m.err = errors.New("Füge erstmal Restaurants hinzu!")
+					return m, nil
+				}
+				length := len(m.savedRestaurants.Restaurants)
+				m.cursorRestaurant = (m.cursorRestaurant - 1 + length) % length
 			}
-			length := len(m.savedRestaurants.Restaurants)
-			m.cursorRestaurant = (m.cursorRestaurant - 1 + length) % length
 		case "down", "s":
-			if len(m.savedRestaurants.Restaurants) == 0 {
-				m.err = errors.New("Füge erstmal Restaurants hinzu!")
-				return m, nil
+			if !m.addingMode {
+				if len(m.savedRestaurants.Restaurants) == 0 {
+					m.err = errors.New("Füge erstmal Restaurants hinzu!")
+					return m, nil
+				}
+				length := len(m.savedRestaurants.Restaurants)
+				m.cursorRestaurant = (m.cursorRestaurant + 1) % length
 			}
-			length := len(m.savedRestaurants.Restaurants)
-			m.cursorRestaurant = (m.cursorRestaurant + 1) % length
 		case "enter":
 			if m.addingMode {
 				name := m.nameInput.Value()
@@ -236,13 +240,23 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 		case "d":
-			return m, func() tea.Msg {
-				return DeleteRestaurantCmd(m.userConfPath, m.savedRestaurants.Restaurants[m.cursorRestaurant])
+			if !m.addingMode {
+				return m, func() tea.Msg {
+					return DeleteRestaurantCmd(m.userConfPath, m.savedRestaurants.Restaurants[m.cursorRestaurant])
+				}
 			}
 		case "r":
-			return m, GetRestaurantsCmd(m.userConfPath)
+			if !m.addingMode {
+				return m, GetRestaurantsCmd(m.userConfPath)
+			}
 		case "q":
-			return m, tea.Quit
+			if !m.addingMode {
+				return m, tea.Quit
+			}
+		case "esc":
+			if m.addingMode {
+				m.addingMode = !m.addingMode
+			}
 		}
 	case RestaurantsMsg:
 		m.savedRestaurants = msg.Restaurants
