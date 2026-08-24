@@ -274,7 +274,11 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ChooseRestaurantModel) View() tea.View {
-	headline := styles.Headline.Render("SV Restaurant TUI")
+	version, ok := Version()
+	if !ok {
+		version = "not found ..."
+	}
+	headline := styles.Headline.Render(fmt.Sprintf("SV Restaurant TUI   %v", version))
 
 	text := styles.Text.Render("Wähle das Restaurant aus!")
 

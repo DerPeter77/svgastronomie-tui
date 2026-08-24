@@ -1,37 +1,11 @@
 package ui
 
 import (
-	"fmt"
-	"runtime/debug"
-
 	"github.com/DerPeter77/svgastronomie-tui/ui/events"
 	"github.com/DerPeter77/svgastronomie-tui/ui/pages"
 
 	tea "charm.land/bubbletea/v2"
 )
-
-const modulePath string = "github.com/DerPeter77/svgastronomie-tui"
-
-func Version() (version string, ok bool) {
-	info, ok := debug.ReadBuildInfo()
-	if !ok {
-		return version, ok
-	}
-
-	// 1. If consumed as a module dependency in another application:
-	for _, dep := range info.Deps {
-		if dep.Path == modulePath {
-			return dep.Version, true
-		}
-	}
-
-	// 2. If running directly from inside this module (e.g. tests or main binary):
-	if info.Main.Path == modulePath && info.Main.Version != "" {
-		return info.Main.Version, true
-	}
-
-	return version, false
-}
 
 type PageModel tea.Model
 
@@ -93,13 +67,8 @@ func (m AppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m AppModel) View() tea.View {
-	version, ok := Version()
-	if !ok {
-		version = "not found ..."
-	}
 	if page, ok := m.pages[m.activePageKey]; ok {
 		view := page.View()
-		view.Content += fmt.Sprintf("\n\n\n\n\nVersion: %v", version)
 		return view
 	}
 	return tea.NewView("Unbekannte Seite")

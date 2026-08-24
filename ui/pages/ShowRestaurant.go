@@ -2,6 +2,7 @@ package pages
 
 import (
 	"fmt"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -14,6 +15,28 @@ import (
 	sv "github.com/EchterTimo/go-svgastronomie"
 )
 
+func Version() (version string, ok bool) {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return version, ok
+	}
+
+	// 1. If consumed as a module dependency in another application:
+	for _, dep := range info.Deps {
+		if dep.Path == "github.com/DerPeter77/svgastronomie-tui" {
+			return dep.Version, true
+		}
+	}
+
+	// 2. If running directly from inside this module (e.g. tests or main binary):
+	if info.Main.Path == "github.com/DerPeter77/svgastronomie-tui" && info.Main.Version != "" {
+		return info.Main.Version, true
+	}
+
+	return version, false
+}
+
+// Spinners
 var sandspinner = []string{"⠁", "⠂", "⠄", "⡀", "⡈", "⡐", "⡠", "⣀", "⣁", "⣂", "⣄", "⣌", "⣔",
 	"⣤", "⣥", "⣦", "⣮", "⣶", "⣷", "⣿", "⡿", "⠿", "⢟", "⠟", "⡛", "⠛", "⠫", "⢋", "⠋", "⠍", "⡉", "⠉", "⠑", "⠡", "⢁"}
 
@@ -99,7 +122,11 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m ShowRestaurantModel) View() tea.View {
-	headline := styles.Headline.Render("SV Restaurant TUI")
+	version, ok := Version()
+	if !ok {
+		version = "not found ..."
+	}
+	headline := styles.Headline.Render(fmt.Sprintf("SV Restaurant TUI   %v", version))
 
 	text := styles.Text.Render(fmt.Sprintf("Speiseplan vom Restaurant: %v", m.showRestaurant.Name))
 	text += "\n\n"
@@ -130,7 +157,7 @@ func (m ShowRestaurantModel) View() tea.View {
 				tags = " - "
 				tags += strings.Join(dish.Tags, ", ")
 			}
-			dishes = append(dishes, styles.Border.Render(styles.Text.Render(fmt.Sprintf("%v - %.2f€ \n%v%v", dish.Name, dish.Price, dish.Description, tags))))
+			dishes = append(dishes, lipgloss.Wrap(styles.Text.Render(fmt.Sprintf("%v - %.2f€ \n%v%v", dish.Name, dish.Price, dish.Description, tags)), m.width, ""))
 		}
 
 		text += strings.Join(dishes, "\n")
