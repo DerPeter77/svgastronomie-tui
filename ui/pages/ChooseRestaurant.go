@@ -31,6 +31,7 @@ func loadDefaultPath() tea.Msg {
 }
 
 // Functions for Saving Restaurants in yaml File
+
 func getSavedRestaurantsFromYAML(path string) (events.SavedRestaurants, error) {
 	savedRestaurants := events.SavedRestaurants{}
 	dir := filepath.Dir(path)
