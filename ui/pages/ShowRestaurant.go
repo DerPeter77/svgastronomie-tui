@@ -51,6 +51,9 @@ type scrapedRestaurantMsg struct {
 
 func scrapeRestaurant(url string) tea.Msg {
 	scrapedRestaurant, err := sv.ScrapeRestaurant(url, nil)
+	if err != nil {
+		return scrapedRestaurantMsg{err: err}
+	}
 
 	return scrapedRestaurantMsg{
 		restaurant: *scrapedRestaurant,
