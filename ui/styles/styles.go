@@ -47,12 +47,13 @@ var tabBorder = lipgloss.Border{
 
 var Tab = lipgloss.NewStyle().
 	Border(tabBorder, true).
-	BorderForeground(lipgloss.White).
+	BorderForeground(lipgloss.BrightBlack).
 	Padding(0, 1)
 
 var ActiveTab = Tab.
 	Border(activeTabBorder, true).
-	Foreground(lipgloss.BrightWhite).
+	Foreground(lipgloss.Blue).
+	Bold(true).
 	BorderForeground(lipgloss.BrightWhite)
 
 var TabGap = Tab.
