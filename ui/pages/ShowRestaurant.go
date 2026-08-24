@@ -2,7 +2,6 @@ package pages
 
 import (
 	"fmt"
-	"slices"
 	"strings"
 	"time"
 
@@ -18,25 +17,14 @@ import (
 var sandspinner = []string{"⠁", "⠂", "⠄", "⡀", "⡈", "⡐", "⡠", "⣀", "⣁", "⣂", "⣄", "⣌", "⣔",
 	"⣤", "⣥", "⣦", "⣮", "⣶", "⣷", "⣿", "⡿", "⠿", "⢟", "⠟", "⡛", "⠛", "⠫", "⢋", "⠋", "⠍", "⡉", "⠉", "⠑", "⠡", "⢁"}
 
-var circlespinner = []string{"◜", "◠", "◝", "◞", "◡", "◟"}
+// var circlespinner = []string{"◜", "◠", "◝", "◞", "◡", "◟"}
 
-var starspinner = []string{"✶", "✸", "✹", "✺", "✹", "✷"}
+// var starspinner = []string{"✶", "✸", "✹", "✺", "✹", "✷"}
 
 type scrapedRestaurantMsg struct {
 	restaurant sv.Restaurant
 	err        error
 }
-
-// func scrapeRestaurant(url string) tea.Cmd {
-// 	scrapedRestaurant, err := sv.ScrapeRestaurant(url, nil)
-
-// 	return func() tea.Msg {
-// 		return scrapedRestaurantMsg{
-// 			restaurant: *scrapedRestaurant,
-// 			err:        err,
-// 		}
-// 	}
-// }
 
 func scrapeRestaurant(url string) tea.Msg {
 	scrapedRestaurant, err := sv.ScrapeRestaurant(url, nil)
@@ -58,10 +46,8 @@ type ShowRestaurantModel struct {
 }
 
 func NewShowRestaurantPage() ShowRestaurantModel {
-	// Custom "orbit" spinner - inspired by CLI spinners from Node.js/Rust/Python ecosystems
-	// A planet orbiting a center with a trailing comet effect
 	spinner := spinner.New()
-	spinner.Spinner.Frames = slices.Concat(sandspinner, circlespinner, starspinner)
+	spinner.Spinner.Frames = sandspinner
 	spinner.Spinner.FPS = time.Second / 12
 	return ShowRestaurantModel{
 		showRestaurant:    events.Restaurant{},
@@ -73,7 +59,7 @@ func NewShowRestaurantPage() ShowRestaurantModel {
 }
 
 func (m ShowRestaurantModel) Init() tea.Cmd {
-	return tea.Batch(GetRestaurantsCmd("SavedRestaurants.yaml"), tea.RequestWindowSize, m.spinner.Tick)
+	return tea.Batch(tea.RequestWindowSize, m.spinner.Tick)
 }
 
 func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
