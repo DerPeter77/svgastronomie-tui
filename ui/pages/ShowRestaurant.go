@@ -169,7 +169,7 @@ func (m ShowRestaurantModel) View() tea.View {
 				)
 			}
 		} else {
-			dishes = append(dishes, styles.Border.Render("Für den Tag wurden keine Gerichte gefunden : ("))
+			dishes = append(dishes, styles.Border.Render("Für den Tag wurden keine Gerichte gefunden :("))
 		}
 
 		text += strings.Join(dishes, "\n")
