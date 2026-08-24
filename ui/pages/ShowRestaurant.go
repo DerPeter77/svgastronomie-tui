@@ -99,7 +99,8 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			length := len(m.scrapedRestaurant.Week.Days)
 			m.activeDayTab = (m.activeDayTab + 1) % length
 		case "esc":
-			return m, events.NavigateTo(events.ChooseRestaurantPageKey)
+			newModel := NewShowRestaurantPage()
+			return newModel, events.NavigateTo(events.ChooseRestaurantPageKey)
 		case "q":
 			return m, tea.Quit
 		}
@@ -151,20 +152,24 @@ func (m ShowRestaurantModel) View() tea.View {
 
 		// Dishes per tab
 		var dishes []string
-		for _, dish := range m.scrapedRestaurant.Week.Days[m.activeDayTab].Dishes {
-			tags := ""
-			if len(dish.Tags) > 0 {
-				tags = " - "
-				tags += strings.Join(dish.Tags, ", ")
-			}
-			dishes = append(dishes,
-				styles.Border.Render(
-					lipgloss.Wrap(
-						styles.Text.Render(fmt.Sprintf("%v - %.2f€ \n%v%v", dish.Name, dish.Price, dish.Description, tags)),
-						m.width-10, "",
+		if len(m.scrapedRestaurant.Week.Days[m.activeDayTab].Dishes) > 0 {
+			for _, dish := range m.scrapedRestaurant.Week.Days[m.activeDayTab].Dishes {
+				tags := ""
+				if len(dish.Tags) > 0 {
+					tags = " - "
+					tags += strings.Join(dish.Tags, ", ")
+				}
+				dishes = append(dishes,
+					styles.Border.Render(
+						lipgloss.Wrap(
+							styles.Text.Render(fmt.Sprintf("%v - %.2f€ \n%v%v", dish.Name, dish.Price, dish.Description, tags)),
+							m.width-10, "",
+						),
 					),
-				),
-			)
+				)
+			}
+		} else {
+			dishes = append(dishes, styles.Border.Render("Für den Tag wurden keine Gerichte gefunden : ("))
 		}
 
 		text += strings.Join(dishes, "\n")
