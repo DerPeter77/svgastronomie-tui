@@ -61,6 +61,13 @@ func scrapeRestaurant(url string) tea.Msg {
 	}
 }
 
+type currentDayMsg int
+
+func getCurrentDay() tea.Msg {
+	currentDay := time.Now().Weekday()
+	return currentDayMsg(currentDay)
+}
+
 type ShowRestaurantModel struct {
 	width, height     int
 	showRestaurant    events.Restaurant
@@ -86,7 +93,7 @@ func NewShowRestaurantPage() ShowRestaurantModel {
 }
 
 func (m ShowRestaurantModel) Init() tea.Cmd {
-	return tea.Batch(tea.RequestWindowSize, m.spinner.Tick)
+	return tea.Batch(tea.RequestWindowSize, m.spinner.Tick, getCurrentDay)
 }
 
 func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -123,6 +130,13 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.scrapedRestaurant = sv.Restaurant(msg.restaurant)
 		m.isLoading = false
+	case currentDayMsg:
+		currentDay := int(msg) - 1
+		if currentDay >= 0 && currentDay <= 5 {
+			m.activeDayTab = currentDay
+		} else {
+			m.activeDayTab = 0
+		}
 	}
 
 	var cmd tea.Cmd
@@ -140,6 +154,8 @@ func (m ShowRestaurantModel) View() tea.View {
 
 	text := styles.Text.Render(fmt.Sprintf("Speiseplan vom Restaurant: %v", m.showRestaurant.Name))
 	text += "\n\n"
+
+	text += fmt.Sprintf("%v\n\n", m.activeDayTab)
 
 	if len(m.scrapedRestaurant.Week.Days) > 0 {
 		// Days Tabs
