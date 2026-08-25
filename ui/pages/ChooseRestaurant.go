@@ -91,12 +91,16 @@ func deleteRestaurant(path string, restaurant events.Restaurant) (deleted []even
 		return nil, err
 	}
 
-	for index, value := range saved.Restaurants {
-		if restaurant == value {
-			deleted = append(deleted, value)
-			saved.Restaurants = slices.Delete(saved.Restaurants, index, index+1)
-			break
+	if len(saved.Restaurants) > 0 {
+		for index, value := range saved.Restaurants {
+			if restaurant == value {
+				deleted = append(deleted, value)
+				saved.Restaurants = slices.Delete(saved.Restaurants, index, index+1)
+				break
+			}
 		}
+	} else {
+		return deleted, errors.New("Es gibt keine Restaurants zum löschen")
 	}
 
 	err = saveRestaurants(path, saved)
@@ -241,19 +245,24 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "d":
 			if !m.addingMode {
-				deleteCursor := m.cursorRestaurant
-				if m.cursorRestaurant > 0 {
-					if len(m.savedRestaurants.Restaurants) == 0 {
-						m.err = errors.New("Füge erstmal Restaurants hinzu!")
-						return m, nil
+				if len(m.savedRestaurants.Restaurants) > 0 {
+					deleteCursor := m.cursorRestaurant
+					if m.cursorRestaurant > 0 {
+						if len(m.savedRestaurants.Restaurants) == 0 {
+							m.err = errors.New("Füge erstmal Restaurants hinzu!")
+							return m, nil
+						}
+						length := len(m.savedRestaurants.Restaurants)
+						m.cursorRestaurant = (m.cursorRestaurant - 1 + length) % length
+					} else {
+						m.cursorRestaurant = 0
 					}
-					length := len(m.savedRestaurants.Restaurants)
-					m.cursorRestaurant = (m.cursorRestaurant - 1 + length) % length
+					return m, func() tea.Msg {
+						return DeleteRestaurantCmd(m.userConfPath, m.savedRestaurants.Restaurants[deleteCursor])
+					}
 				} else {
-					m.cursorRestaurant = 0
-				}
-				return m, func() tea.Msg {
-					return DeleteRestaurantCmd(m.userConfPath, m.savedRestaurants.Restaurants[deleteCursor])
+					m.err = errors.New("Es gibt kein Restaurant zum löschen!")
+					return m, nil
 				}
 			}
 		case "r":
