@@ -241,8 +241,19 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case "d":
 			if !m.addingMode {
+				deleteCursor := m.cursorRestaurant
+				if m.cursorRestaurant > 0 {
+					if len(m.savedRestaurants.Restaurants) == 0 {
+						m.err = errors.New("Füge erstmal Restaurants hinzu!")
+						return m, nil
+					}
+					length := len(m.savedRestaurants.Restaurants)
+					m.cursorRestaurant = (m.cursorRestaurant - 1 + length) % length
+				} else {
+					m.cursorRestaurant = 0
+				}
 				return m, func() tea.Msg {
-					return DeleteRestaurantCmd(m.userConfPath, m.savedRestaurants.Restaurants[m.cursorRestaurant])
+					return DeleteRestaurantCmd(m.userConfPath, m.savedRestaurants.Restaurants[deleteCursor])
 				}
 			}
 		case "r":
