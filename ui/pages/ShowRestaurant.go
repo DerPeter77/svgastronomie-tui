@@ -155,8 +155,6 @@ func (m ShowRestaurantModel) View() tea.View {
 	text := styles.Text.Render(fmt.Sprintf("Speiseplan vom Restaurant: %v", m.showRestaurant.Name))
 	text += "\n\n"
 
-	text += fmt.Sprintf("%v\n\n", m.activeDayTab)
-
 	if len(m.scrapedRestaurant.Week.Days) > 0 {
 		// Days Tabs
 		var days []string
