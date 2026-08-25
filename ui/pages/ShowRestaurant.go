@@ -68,7 +68,8 @@ type ShowRestaurantModel struct {
 	activeDayTab      int
 	err               error
 
-	spinner spinner.Model
+	isLoading bool
+	spinner   spinner.Model
 }
 
 func NewShowRestaurantPage() ShowRestaurantModel {
@@ -96,11 +97,15 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "left", "a":
-			length := len(m.scrapedRestaurant.Week.Days)
-			m.activeDayTab = (m.activeDayTab - 1 + length) % length
+			if !m.isLoading {
+				length := len(m.scrapedRestaurant.Week.Days)
+				m.activeDayTab = (m.activeDayTab - 1 + length) % length
+			}
 		case "right", "d":
-			length := len(m.scrapedRestaurant.Week.Days)
-			m.activeDayTab = (m.activeDayTab + 1) % length
+			if !m.isLoading {
+				length := len(m.scrapedRestaurant.Week.Days)
+				m.activeDayTab = (m.activeDayTab + 1) % length
+			}
 		case "esc":
 			newModel := NewShowRestaurantPage()
 			return newModel, events.NavigateTo(events.ChooseRestaurantPageKey)
@@ -109,7 +114,7 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case events.ChooseRestaurantMsg:
 		m.showRestaurant = events.Restaurant(msg)
-
+		m.isLoading = true
 		return m, func() tea.Msg { return scrapeRestaurant(m.showRestaurant.Url) }
 	case scrapedRestaurantMsg:
 		if msg.err != nil {
@@ -117,6 +122,7 @@ func (m ShowRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		m.scrapedRestaurant = sv.Restaurant(msg.restaurant)
+		m.isLoading = false
 	}
 
 	var cmd tea.Cmd
