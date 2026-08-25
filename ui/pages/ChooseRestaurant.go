@@ -208,18 +208,22 @@ func (m ChooseRestaurantModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.addingMode {
 				name := m.nameInput.Value()
 				url := m.urlInput.Value()
-				m.addingMode = false
-				m.nameInput.Reset()
-				m.urlInput.Reset()
-				return m, tea.Sequence(
-					func() tea.Msg {
-						return AddRestaurantCmd(m.userConfPath, events.Restaurant{Name: name, Url: url})
-					},
-					func() tea.Msg {
-						restaurants, err := getSavedRestaurantsFromYAML(m.userConfPath)
-						return RestaurantsMsg{Restaurants: restaurants, err: err}
-					},
-				)
+				if name != "" && url != "" {
+					m.addingMode = false
+					m.nameInput.Reset()
+					m.urlInput.Reset()
+					return m, tea.Sequence(
+						func() tea.Msg {
+							return AddRestaurantCmd(m.userConfPath, events.Restaurant{Name: name, Url: url})
+						},
+						func() tea.Msg {
+							restaurants, err := getSavedRestaurantsFromYAML(m.userConfPath)
+							return RestaurantsMsg{Restaurants: restaurants, err: err}
+						},
+					)
+				} else {
+					m.err = errors.New("Name und Url dürfen nicht leer sein!")
+				}
 			} else {
 				return m, tea.Batch(
 					events.NavigateTo(events.ShowRestaurantPageKey),
